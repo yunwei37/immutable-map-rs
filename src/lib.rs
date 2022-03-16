@@ -22,20 +22,40 @@ impl<T: PartialOrd + Clone, V: Clone + Default> PartialEq for ImmutableMapConten
     }
 }
 
-type ImmutableMap<T, V> = ImmutableSet<ImmutableMapContent<T, V>>;
+pub struct ImmutableMap<T: PartialOrd + Clone, V: Clone + Default> {
+    set: ImmutableSet<ImmutableMapContent<T, V>>,
+}
 
 impl<T: PartialOrd + Clone, V: Clone + Default> ImmutableMap<T, V> {
-    pub fn insert_map(&self, key: T, val: V) -> Self {
-        self.insert(ImmutableMapContent { key, val })
+    pub fn new() -> Self {
+        ImmutableMap {
+            set: ImmutableSet::new(),
+        }
     }
-    pub fn delete_map(&self, key: T, val: V) -> Self {
-        self.insert(ImmutableMapContent { key, val })
+    pub fn insert(&self, key: T, val: V) -> Self {
+        ImmutableMap {
+            set: self.set.insert(ImmutableMapContent { key, val }),
+        }
     }
-    pub fn contains_map(&self, key: T, val: V) -> bool {
-        self.contains(ImmutableMapContent { key, val })
+    pub fn delete(&self, key: T) -> Self {
+        ImmutableMap {
+            set: self.set.delete(ImmutableMapContent {
+                key,
+                val: V::default(),
+            }),
+        }
+    }
+    pub fn contains(&self, key: T, val: V) -> bool {
+        self.set.contains(ImmutableMapContent { key, val })
+    }
+    pub fn size(&self) -> usize {
+        self.set.size()
     }
     pub fn get_val_as_ref(&self, key: T) -> Option<&V> {
-        let content = self.get_as_ref(ImmutableMapContent { key, val:V::default() });
+        let content = self.set.get_as_ref(ImmutableMapContent {
+            key,
+            val: V::default(),
+        });
         if let Some(content) = content {
             Some(&content.val)
         } else {
@@ -53,9 +73,12 @@ mod tests {
         let new_set = set.insert(1);
         assert_eq!(new_set.size(), 1);
 
-        let set = ImmutableMap::new();
-        let new_set = set.insert_map(1, "abc");
-        assert_eq!(new_set.size(), 1);
-
+        let map = ImmutableMap::new();
+        let new_map = map.insert(1, "abc");
+        assert_eq!(new_map.size(), 1);
+        let new_map = new_map.insert(2, "def");
+        assert_eq!(new_map.get_val_as_ref(2), Some(&"def"));
+        let new_map = new_map.delete(1);
+        assert_eq!(new_map.size(), 1);
     }
 }

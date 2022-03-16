@@ -180,7 +180,7 @@ impl<T: PartialOrd + Clone> TreeNode<T> {
             true
         }
     }
-    pub fn get_as_ref(&self, val:T) -> Option<&T> {
+    pub fn get_as_ref(&self, val: T) -> Option<&T> {
         if val < self.val {
             if let Some(ln) = &self.left {
                 ln.get_as_ref(val)
@@ -254,6 +254,7 @@ impl<T: PartialOrd + Clone> ImmutAvlTree<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_tree_node() {
         let node = TreeNode::new(1, None, None);
@@ -279,5 +280,8 @@ mod tests {
         assert!(tree.contains(99));
         assert!(!tree.contains(100));
         assert_eq!(tree.size(), 99);
+        tree = tree.delete(1);
+        assert_eq!(tree.size(), 98);
+        assert_eq!(tree.get_as_ref(2), Some(&2));
     }
 }
