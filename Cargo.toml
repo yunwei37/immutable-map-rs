@@ -1,6 +1,13 @@
 [package]
-name = "immutable-map"
+name = "immutable-avl"
 version = "1.0.0"
 edition = "2021"
+authors = ["yunwei37 <1067852565@qq.com>"]
+description = "An Immutable map and set implement for rust based on an AVL tree"
+readme = "README.md"
+homepage = "https://github.com/yunwei37/immutable-map-rs"
+repository = "https://github.com/yunwei37/immutable-map-rs"
+license = "MIT"
+keywords = ["immutable", "avl", "persistent"]
 
 [dependencies]
