@@ -121,12 +121,12 @@ impl<T: PartialOrd + Clone> TreeNode<T> {
             TreeNode::new(val, self.left.clone(), self.right.clone())
         }
     }
-    fn remove_min(&self) -> AvlTreeImpl<T> {
+    fn remove_min(&self) -> (AvlTreeImpl<T>, T) {
         if let Some(ln) = &self.left {
             let left = ln.remove_min();
-            TreeNode::balance_tree(self.val.clone(), left, self.right.clone())
+            (TreeNode::balance_tree(self.val.clone(), left.0, self.right.clone()), left.1)
         } else {
-            self.right.clone()
+            (self.right.clone(), self.val.clone())
         }
     }
     fn combine_trees(&self, left: &AvlTreeImpl<T>, right: &AvlTreeImpl<T>) -> AvlTreeImpl<T> {
@@ -135,8 +135,12 @@ impl<T: PartialOrd + Clone> TreeNode<T> {
         } else if let None = right {
             left.clone()
         } else {
-            let new_right = self.remove_min();
-            TreeNode::balance_tree(self.val.clone(), left.clone(), new_right)
+            if let Some(right) = &self.right {
+                let new_right = right.remove_min();
+                TreeNode::balance_tree(new_right.1, left.clone(), new_right.0)
+            } else {
+                left.clone()
+            }
         }
     }
     fn do_delete(&self, val: T) -> AvlTreeImpl<T> {
@@ -267,6 +271,8 @@ mod tests {
         assert!(!node3.as_ref().unwrap().as_ref().contains(0));
         let node4 = node3.unwrap().as_ref().do_delete(1);
         assert!(!node4.as_ref().unwrap().as_ref().contains(1));
+        assert!(node4.as_ref().unwrap().as_ref().contains(2));
+        assert!(node4.as_ref().unwrap().as_ref().contains(3));
     }
 
     #[test]
